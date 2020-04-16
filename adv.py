@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from room import Room
 from player import Player
 from world import World
@@ -25,9 +27,12 @@ world.print_rooms()
 
 player = Player(world.starting_room)
 
+# print(player._find_nearest_unvisited(set()))
+# traversal_path = player.build_traversal()
+traversal_path = player.traverse()
+print(traversal_path)
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
-traversal_path = []
 
 
 
@@ -37,14 +42,14 @@ player.current_room = world.starting_room
 visited_rooms.add(player.current_room)
 
 for move in traversal_path:
-    player.travel(move)
-    visited_rooms.add(player.current_room)
+	player.travel(move)
+	visited_rooms.add(player.current_room)
 
 if len(visited_rooms) == len(room_graph):
-    print(f"TESTS PASSED: {len(traversal_path)} moves, {len(visited_rooms)} rooms visited")
+	print(f"TESTS PASSED: {len(traversal_path)} moves, {len(visited_rooms)} rooms visited")
 else:
-    print("TESTS FAILED: INCOMPLETE TRAVERSAL")
-    print(f"{len(room_graph) - len(visited_rooms)} unvisited rooms")
+	print("TESTS FAILED: INCOMPLETE TRAVERSAL")
+	print(f"{len(room_graph) - len(visited_rooms)} unvisited rooms")
 
 
 
@@ -53,10 +58,10 @@ else:
 #######
 player.current_room.print_room_description(player)
 while True:
-    cmds = input("-> ").lower().split(" ")
-    if cmds[0] in ["n", "s", "e", "w"]:
-        player.travel(cmds[0], True)
-    elif cmds[0] == "q":
-        break
-    else:
-        print("I did not understand that command.")
+	cmds = input("-> ").lower().split(" ")
+	if cmds[0] in ["n", "s", "e", "w"]:
+		player.travel(cmds[0], True)
+	elif cmds[0] == "q":
+		break
+	else:
+		print("I did not understand that command.")
