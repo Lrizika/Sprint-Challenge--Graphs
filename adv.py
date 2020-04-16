@@ -23,14 +23,24 @@ room_graph=literal_eval(open(map_file, "r").read())
 world.load_graph(room_graph)
 
 # Print an ASCII map
-world.print_rooms()
+# world.print_rooms()
 
-player = Player(world.starting_room)
 
 # print(player._find_nearest_unvisited(set()))
 # traversal_path = player.build_traversal()
-traversal_path = player.traverse()
-print(traversal_path)
+player = Player(world.starting_room)
+best_path = player.traverse()
+print(f'Starting best length: {len(best_path)}')
+for diff_threshold in range(6):
+	print(f'Tuning on diff_threshold: {diff_threshold}')
+	for seed in range(50):
+		player = Player(world.starting_room)
+		traversal_path = player.traverse(seed=seed, diff_threshold=diff_threshold)
+		# print(len(traversal_path))
+		if len(traversal_path) < len(best_path):
+			print(f'New best path - diff_threshold {diff_threshold}, seed {seed}, length: {len(traversal_path)}')
+			best_path = traversal_path
+traversal_path = best_path
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 

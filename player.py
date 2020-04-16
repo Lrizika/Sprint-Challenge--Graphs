@@ -1,5 +1,6 @@
 from enum import IntEnum
 from collections import deque
+import random
 
 
 class Direction(IntEnum):
@@ -24,6 +25,8 @@ class Direction(IntEnum):
 class Player:
 	def __init__(self, starting_room):
 		self.current_room = starting_room
+		self.starting_x = starting_room.x
+		self.starting_y = starting_room.y
 
 	def travel(self, direction, show_rooms=False):
 		next_room = self.current_room.get_room_in_direction(direction)
@@ -34,7 +37,9 @@ class Player:
 		else:
 			print("You cannot move in that direction.")
 
-	def _find_nearest_unvisited(self, visited):
+	def _find_nearest_unvisited(self, visited, seed=None, diff_threshold=2):
+		if seed is not None:
+			random.seed(seed)
 		search_visited = set()
 		to_visit = deque()
 		to_visit.append([self.current_room])
@@ -49,19 +54,43 @@ class Player:
 				continue
 			else:
 				search_visited.add(current_path[-1])
-				for direction in Direction:
-					direction = direction.offset(2)
+
+				x_diff = self.current_room.x - self.starting_x
+				y_diff = self.current_room.y - self.starting_y
+				if seed is not None:
+					starting_direction = Direction(random.randint(0, 3))
+				else:
+					starting_direction = Direction.n
+
+				if x_diff > 0 and abs(x_diff) - abs(y_diff) > diff_threshold:
+					starting_direction = Direction.e
+				elif x_diff < 0 and abs(x_diff) - abs(y_diff) > diff_threshold:
+					starting_direction = Direction.w
+				elif y_diff > 0 and abs(y_diff) - abs(x_diff) > diff_threshold:
+					starting_direction = Direction.n
+				elif y_diff < 0 and abs(y_diff) - abs(x_diff) > diff_threshold:
+					starting_direction = Direction.s
+
+				for i in range(len(Direction)):
+					direction = starting_direction.offset(i)
+					room = current_path[-1].get_room_in_direction(direction.name)
+					if room is not None:
+						starting_direction = direction
+						break
+
+				for i in range(len(Direction)):
+					direction = starting_direction.offset(i)
 					room = current_path[-1].get_room_in_direction(direction.name)
 					if room is not None:
 						to_visit.appendleft(current_path + [room])
 						routes.appendleft(current_route + [direction.name])
 
-	def traverse(self, num_rooms=499):
+	def traverse(self, num_rooms=499, seed=None, diff_threshold=2):
 		visited = set()
 		route = []
 		while len(visited) < num_rooms:
 			visited.add(self.current_room)
-			new_route = self._find_nearest_unvisited(visited)
+			new_route = self._find_nearest_unvisited(visited, seed=seed, diff_threshold=diff_threshold)
 			route.extend(new_route)
 			for direction in new_route:
 				self.travel(direction)
