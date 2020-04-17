@@ -31,11 +31,18 @@ world.load_graph(room_graph)
 player = Player(world.starting_room)
 best_path = player.traverse()
 print(f'Starting best length: {len(best_path)}')
-for diff_threshold in range(6):
+for diff_threshold in range(5):
 	print(f'Tuning on diff_threshold: {diff_threshold}')
-	for seed in range(50):
+	for seed in range(20):
 		player = Player(world.starting_room)
-		traversal_path = player.traverse(seed=seed, diff_threshold=diff_threshold)
+		traversal_path = player.traverse(
+			seed=seed,
+			seed_weight=0.05,
+			diff_threshold=diff_threshold,
+			diff_weight=0.2,
+			# locality_radius=1,
+			locality_weight=0.4,
+		)
 		# print(len(traversal_path))
 		if len(traversal_path) < len(best_path):
 			print(f'New best path - diff_threshold {diff_threshold}, seed {seed}, length: {len(traversal_path)}')
